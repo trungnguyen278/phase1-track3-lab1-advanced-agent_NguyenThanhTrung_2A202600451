@@ -13,13 +13,20 @@ class QAExample(BaseModel):
     gold_answer: str
     context: list[ContextChunk]
 
+FailureMode = Literal["none", "entity_drift", "incomplete_multi_hop", "wrong_final_answer", "looping", "reflection_overfit"]
+
 class JudgeResult(BaseModel):
-    # TODO: Học viên định nghĩa các trường cần thiết cho kết quả đánh giá (score, reason, ...)
-    pass
+    score: int = 0
+    reason: str = ""
+    missing_evidence: list[str] = Field(default_factory=list)
+    spurious_claims: list[str] = Field(default_factory=list)
+    failure_mode: FailureMode = "none"
 
 class ReflectionEntry(BaseModel):
-    # TODO: Học viên định nghĩa các trường cần thiết cho một mục reflection (attempt_id, lesson, strategy, ...)
-    pass
+    attempt_id: int
+    failure_reason: str = ""
+    lesson: str = ""
+    next_strategy: str = ""
 
 class AttemptTrace(BaseModel):
     attempt_id: int
@@ -40,7 +47,7 @@ class RunRecord(BaseModel):
     attempts: int
     token_estimate: int
     latency_ms: int
-    failure_mode: Literal["none", "entity_drift", "incomplete_multi_hop", "wrong_final_answer", "looping", "reflection_overfit"]
+    failure_mode: FailureMode
     reflections: list[ReflectionEntry] = Field(default_factory=list)
     traces: list[AttemptTrace] = Field(default_factory=list)
 

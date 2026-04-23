@@ -7,5 +7,6 @@ ENV/
 env/
 .env
 .pytest_cache/
-outputs/
+
 .DS_Store
+.claude/

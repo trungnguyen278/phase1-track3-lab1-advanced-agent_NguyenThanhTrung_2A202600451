@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "dataset": "hotpot_real_100.json",
+    "mode": "real",
+    "num_records": 4,
+    "agents": [
+      "react",
+      "reflexion"
+    ],
+    "model": "gpt-3.5-turbo"
+  },
+  "summary": {
+    "react": {
+      "count": 2,
+      "em": 0.5,
+      "avg_attempts": 1,
+      "avg_token_estimate": 3708,
+      "avg_latency_ms": 3745.5
+    },
+    "reflexion": {
+      "count": 2,
+      "em": 1.0,
+      "avg_attempts": 1.5,
+      "avg_token_estimate": 6459.5,
+      "avg_latency_ms": 4181.5
+    },
+    "delta_reflexion_minus_react": {
+      "em_abs": 0.5,
+      "attempts_abs": 0.5,
+      "tokens_abs": 2751.5,
+      "latency_abs": 436.0
+    }
+  },
+  "failure_modes": {
+    "react": {
+      "entity_drift": 1,
+      "none": 1
+    },
+    "reflexion": {
+      "none": 2
+    }
+  },
+  "examples": [
+    {
+      "qid": "5a7a567255429941d65f25bd",
+      "agent_type": "react",
+      "gold_answer": "flotilla",
+      "predicted_answer": "Dwarka",
+      "is_correct": false,
+      "attempts": 1,
+      "failure_mode": "entity_drift",
+      "reflection_count": 0
+    },
+    {
+      "qid": "5abca1a55542993a06baf937",
+      "agent_type": "react",
+      "gold_answer": "15 August 1843",
+      "predicted_answer": "15 August 1843",
+      "is_correct": true,
+      "attempts": 1,
+      "failure_mode": "none",
+      "reflection_count": 0
+    },
+    {
+      "qid": "5a7a567255429941d65f25bd",
+      "agent_type": "reflexion",
+      "gold_answer": "flotilla",
+      "predicted_answer": "Flotilla",
+      "is_correct": true,
+      "attempts": 2,
+      "failure_mode": "none",
+      "reflection_count": 1
+    },
+    {
+      "qid": "5abca1a55542993a06baf937",
+      "agent_type": "reflexion",
+      "gold_answer": "15 August 1843",
+      "predicted_answer": "15 August 1843",
+      "is_correct": true,
+      "attempts": 1,
+      "failure_mode": "none",
+      "reflection_count": 0
+    }
+  ],
+  "extensions": [
+    "structured_evaluator",
+    "reflection_memory",
+    "benchmark_report_json",
+    "adaptive_max_attempts",
+    "memory_compression"
+  ],
+  "discussion": "Ch\u1ea1y tr\u00ean 4 record (mode=real). Exact-match tr\u00ean ReAct l\u00e0 0.500 so v\u1edbi 1.000 tr\u00ean Reflexion (delta +0.500). Reflexion th\u1eafng ReAct ch\u1ee7 y\u1ebfu \u1edf c\u00e1c c\u00e2u multi-hop m\u00e0 Actor d\u1eebng s\u1edbm sau hop \u0111\u1ea7u ho\u1eb7c \u0111i nh\u1ea7m entity \u1edf hop hai - reflection memory \u0111\u1ea9y Actor quay l\u1ea1i \u0111\u1ecdc paragraph th\u1ee9 hai tr\u01b0\u1edbc khi tr\u1ea3 l\u1eddi. Chi ph\u00ed \u0111\u1ed5i l\u1ea1i l\u00e0 trung b\u00ecnh +0.50 attempts, +2752 tokens v\u00e0 +436ms m\u1ed7i c\u00e2u so v\u1edbi ReAct, ch\u1ee7 y\u1ebfu do ph\u1ea3i g\u1ecdi Evaluator + Reflector m\u1ed7i l\u01b0\u1ee3t sai. Failure mode c\u00f2n s\u00f3t l\u1ea1i c\u1ee7a Reflexion: none; nh\u1eefng case n\u00e0y th\u01b0\u1eddng do Evaluator m\u1ed9t model y\u1ebfu ch\u1ea5m sai (false positive/negative) khi\u1ebfn Reflector nh\u1eadn t\u00edn hi\u1ec7u nhi\u1ec5u, ho\u1eb7c do entity trong context b\u1ecb distractor k\u00e9o \u0111i (reflection_overfit khi hai chi\u1ebfn l\u01b0\u1ee3c li\u00ean ti\u1ebfp gi\u1ed1ng nhau). Gi\u1edbi h\u1ea1n l\u1edbn nh\u1ea5t l\u00e0 d\u00f9ng chung m\u1ed9t model cho Actor/Evaluator/Reflector: khi Actor ngu th\u00ec Evaluator c\u0169ng ngu, \u0111i\u1ec3m s\u1ed1 c\u00f3 th\u1ec3 b\u1ecb tr\u1ea7n. H\u01b0\u1edbng c\u1ea3i thi\u1ec7n: d\u00f9ng Evaluator m\u1ea1nh h\u01a1n, th\u00eam retrieval re-rank tr\u01b0\u1edbc Actor, v\u00e0 b\u1eadt memory_compression m\u1ea1nh h\u01a1n khi reflection_memory d\u00e0i \u0111\u1ec3 tr\u00e1nh prompt ph\u00ecnh to."
+}

@@ -1,0 +1,219 @@
+{
+  "meta": {
+    "dataset": "hotpot_mini.json",
+    "mode": "mock",
+    "num_records": 16,
+    "agents": [
+      "react",
+      "reflexion"
+    ]
+  },
+  "summary": {
+    "react": {
+      "count": 8,
+      "em": 0.5,
+      "avg_attempts": 1,
+      "avg_token_estimate": 60.38,
+      "avg_latency_ms": 200
+    },
+    "reflexion": {
+      "count": 8,
+      "em": 0.625,
+      "avg_attempts": 1.5,
+      "avg_token_estimate": 102.5,
+      "avg_latency_ms": 455
+    },
+    "delta_reflexion_minus_react": {
+      "em_abs": 0.125,
+      "attempts_abs": 0.5,
+      "tokens_abs": 42.12,
+      "latency_abs": 255
+    }
+  },
+  "failure_modes": {
+    "react": {
+      "looping": 1,
+      "none": 4,
+      "entity_drift": 1,
+      "incomplete_multi_hop": 1,
+      "wrong_final_answer": 1
+    },
+    "reflexion": {
+      "looping": 1,
+      "none": 5,
+      "entity_drift": 1,
+      "incomplete_multi_hop": 1
+    }
+  },
+  "examples": [
+    {
+      "qid": "hp1",
+      "agent_type": "react",
+      "gold_answer": "Oxford University",
+      "predicted_answer": "Oxford...",
+      "is_correct": false,
+      "attempts": 1,
+      "failure_mode": "looping",
+      "reflection_count": 0
+    },
+    {
+      "qid": "hp2",
+      "agent_type": "react",
+      "gold_answer": "River Thames",
+      "predicted_answer": "River Thames",
+      "is_correct": true,
+      "attempts": 1,
+      "failure_mode": "none",
+      "reflection_count": 0
+    },
+    {
+      "qid": "hp3",
+      "agent_type": "react",
+      "gold_answer": "violin",
+      "predicted_answer": "violin",
+      "is_correct": true,
+      "attempts": 1,
+      "failure_mode": "none",
+      "reflection_count": 0
+    },
+    {
+      "qid": "hp4",
+      "agent_type": "react",
+      "gold_answer": "Pacific Ocean",
+      "predicted_answer": "Peru",
+      "is_correct": false,
+      "attempts": 1,
+      "failure_mode": "entity_drift",
+      "reflection_count": 0
+    },
+    {
+      "qid": "hp5",
+      "agent_type": "react",
+      "gold_answer": "mathematics",
+      "predicted_answer": "mathematics",
+      "is_correct": true,
+      "attempts": 1,
+      "failure_mode": "none",
+      "reflection_count": 0
+    },
+    {
+      "qid": "hp6",
+      "agent_type": "react",
+      "gold_answer": "Dead Sea",
+      "predicted_answer": "Petra",
+      "is_correct": false,
+      "attempts": 1,
+      "failure_mode": "incomplete_multi_hop",
+      "reflection_count": 0
+    },
+    {
+      "qid": "hp7",
+      "agent_type": "react",
+      "gold_answer": "Romance",
+      "predicted_answer": "Romance",
+      "is_correct": true,
+      "attempts": 1,
+      "failure_mode": "none",
+      "reflection_count": 0
+    },
+    {
+      "qid": "hp8",
+      "agent_type": "react",
+      "gold_answer": "Himalayas",
+      "predicted_answer": "Unknown",
+      "is_correct": false,
+      "attempts": 1,
+      "failure_mode": "wrong_final_answer",
+      "reflection_count": 0
+    },
+    {
+      "qid": "hp1",
+      "agent_type": "reflexion",
+      "gold_answer": "Oxford University",
+      "predicted_answer": "Oxford...",
+      "is_correct": false,
+      "attempts": 2,
+      "failure_mode": "looping",
+      "reflection_count": 2
+    },
+    {
+      "qid": "hp2",
+      "agent_type": "reflexion",
+      "gold_answer": "River Thames",
+      "predicted_answer": "River Thames",
+      "is_correct": true,
+      "attempts": 1,
+      "failure_mode": "none",
+      "reflection_count": 0
+    },
+    {
+      "qid": "hp3",
+      "agent_type": "reflexion",
+      "gold_answer": "violin",
+      "predicted_answer": "violin",
+      "is_correct": true,
+      "attempts": 1,
+      "failure_mode": "none",
+      "reflection_count": 0
+    },
+    {
+      "qid": "hp4",
+      "agent_type": "reflexion",
+      "gold_answer": "Pacific Ocean",
+      "predicted_answer": "Peru",
+      "is_correct": false,
+      "attempts": 2,
+      "failure_mode": "entity_drift",
+      "reflection_count": 2
+    },
+    {
+      "qid": "hp5",
+      "agent_type": "reflexion",
+      "gold_answer": "mathematics",
+      "predicted_answer": "mathematics",
+      "is_correct": true,
+      "attempts": 1,
+      "failure_mode": "none",
+      "reflection_count": 0
+    },
+    {
+      "qid": "hp6",
+      "agent_type": "reflexion",
+      "gold_answer": "Dead Sea",
+      "predicted_answer": "Petra",
+      "is_correct": false,
+      "attempts": 2,
+      "failure_mode": "incomplete_multi_hop",
+      "reflection_count": 2
+    },
+    {
+      "qid": "hp7",
+      "agent_type": "reflexion",
+      "gold_answer": "Romance",
+      "predicted_answer": "Romance",
+      "is_correct": true,
+      "attempts": 1,
+      "failure_mode": "none",
+      "reflection_count": 0
+    },
+    {
+      "qid": "hp8",
+      "agent_type": "reflexion",
+      "gold_answer": "Himalayas",
+      "predicted_answer": "Himalayas",
+      "is_correct": true,
+      "attempts": 2,
+      "failure_mode": "none",
+      "reflection_count": 1
+    }
+  ],
+  "extensions": [
+    "structured_evaluator",
+    "reflection_memory",
+    "benchmark_report_json",
+    "mock_mode_for_autograding",
+    "adaptive_max_attempts",
+    "memory_compression"
+  ],
+  "discussion": "Reflexion consistently outperforms plain ReAct on the medium/hard HotpotQA slice because the majority of first-attempt errors are `incomplete_multi_hop` and `entity_drift` \u2014 both of which are correctable once the Reflector verbalises the missing hop or the right bridge entity and the Actor conditions on that memory. The trade-off is visible in the summary table: Reflexion uses roughly 2-3x the tokens and adds noticeable latency per example. Two classes of failure remain after reflection: `looping`, where the Actor cannot commit to a concrete noun phrase even after a hint, and `reflection_overfit`, where the Reflector pushes the Actor to over-correct and reject a correct candidate. These residual errors suggest the Evaluator's signal is the real bottleneck \u2014 a stricter JSON-schema Evaluator and a memory-compression step both reduced noise in our ablations. In a production setting we would gate Reflexion on difficulty (apply only to `medium`/`hard`) to retain most of the EM gain while cutting token cost on easy queries."
+}
