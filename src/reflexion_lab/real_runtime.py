@@ -30,6 +30,20 @@ load_dotenv()
 MODEL = os.getenv("LAB_LLM_MODEL", "gpt-3.5-turbo")
 TEMPERATURE = float(os.getenv("LAB_LLM_TEMPERATURE", "0"))
 CACHE_PATH = Path(os.getenv("LAB_LLM_CACHE", ".llm_cache.json"))
+# Maximum tokens the completions API may emit. Chat API uses its own default
+# (no cap needed). Instruct models default to 16 which is too small for JSON.
+MAX_COMPLETION_TOKENS = int(os.getenv("LAB_LLM_MAX_TOKENS", "512"))
+
+
+def _is_completions_model(model: str) -> bool:
+    """Legacy /v1/completions models (instruct + base) vs chat.completions."""
+    name = model.lower()
+    return (
+        "instruct" in name
+        or name.startswith("babbage")
+        or name.startswith("davinci")
+        or name in {"text-davinci-003", "text-davinci-002"}
+    )
 
 _cache_lock = Lock()
 _cache: dict[str, dict[str, Any]] | None = None
@@ -84,23 +98,38 @@ def _chat(system: str, user: str, *, json_mode: bool = False) -> dict[str, Any]:
         return {**hit, "cached": True}
 
     client = _get_client()
-    kwargs: dict[str, Any] = {
-        "model": MODEL,
-        "temperature": TEMPERATURE,
-        "messages": [
-            {"role": "system", "content": system},
-            {"role": "user", "content": user},
-        ],
-    }
-    if json_mode:
-        kwargs["response_format"] = {"type": "json_object"}
-
     start = time.perf_counter()
-    resp = client.chat.completions.create(**kwargs)
+    if _is_completions_model(MODEL):
+        # Legacy completions API (e.g. gpt-3.5-turbo-instruct).
+        # Concat system + user as one prompt; append a marker for the model to
+        # continue from. For json_mode we rely purely on prompt instruction +
+        # tolerant parsing since response_format isn't supported.
+        tail = "\n\nJSON:\n" if json_mode else "\n\nAnswer:\n"
+        prompt = f"{system.strip()}\n\n{user.strip()}{tail}"
+        resp = client.completions.create(
+            model=MODEL,
+            prompt=prompt,
+            temperature=TEMPERATURE,
+            max_tokens=MAX_COMPLETION_TOKENS,
+            stop=["\n\n\n"] if not json_mode else None,
+        )
+        content = (resp.choices[0].text or "").strip()
+        tokens = int(getattr(resp.usage, "total_tokens", 0) or 0)
+    else:
+        kwargs: dict[str, Any] = {
+            "model": MODEL,
+            "temperature": TEMPERATURE,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+        }
+        if json_mode:
+            kwargs["response_format"] = {"type": "json_object"}
+        resp = client.chat.completions.create(**kwargs)
+        content = resp.choices[0].message.content or ""
+        tokens = int(getattr(resp.usage, "total_tokens", 0) or 0)
     latency_ms = int((time.perf_counter() - start) * 1000)
-
-    content = resp.choices[0].message.content or ""
-    tokens = int(getattr(resp.usage, "total_tokens", 0) or 0)
     entry = {"content": content, "tokens": tokens, "latency_ms": latency_ms}
 
     with _cache_lock:

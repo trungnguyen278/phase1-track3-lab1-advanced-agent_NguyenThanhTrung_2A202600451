@@ -43,17 +43,16 @@ Grading rules:
   * "reflection_overfit"  : predicted overcorrected based on a previous wrong hint and now contradicts the context.
 - If score = 1, failure_mode must be "none".
 
+IMPORTANT: Every field must be grounded in the ACTUAL question, predicted answer, and context below. Do NOT copy phrasing or entity names from this system message into your output.
+
 OUTPUT: a single JSON object, nothing else. Schema:
 {
   "score": 0 or 1,
-  "reason": "<one short sentence justifying the score>",
-  "missing_evidence": ["<fact the predictor should have used>", ...],
-  "spurious_claims":  ["<claim in predicted not supported by context>", ...],
+  "reason": "<one short sentence, referring to entities from THIS question>",
+  "missing_evidence": ["<fact from THIS context the predictor should have used>", ...],
+  "spurious_claims":  ["<claim in predicted not supported by THIS context>", ...],
   "failure_mode": "none" | "entity_drift" | "incomplete_multi_hop" | "wrong_final_answer" | "looping" | "reflection_overfit"
 }
-
-Example:
-{"score": 0, "reason": "Predicted the birth city instead of the river through it.", "missing_evidence": ["London is crossed by the River Thames."], "spurious_claims": [], "failure_mode": "incomplete_multi_hop"}
 """
 
 REFLECTOR_SYSTEM = """You are a reflection coach. The actor just produced a wrong answer. Your job is to write a SHORT reflection the actor will read before its next attempt.
@@ -65,17 +64,19 @@ You are given:
 - attempt_id (1-based).
 
 Guidelines:
-- `failure_reason`: rephrase the evaluator's reason in one sentence, concrete (name entities).
+- `failure_reason`: rephrase the evaluator's reason using entities from THIS question (not examples from this system message).
 - `lesson`: a generalizable rule of the form "When X, always do Y" (1 sentence).
-- `next_strategy`: a concrete instruction the actor should follow on the NEXT attempt, e.g. "Do the second hop explicitly: identify the river that flows through <city>, not the city itself."
-- Keep each field under 200 chars. Do not leak gold answers you don't know; just steer toward the correct reasoning path.
+- `next_strategy`: a CONCRETE instruction that names the specific entities from THIS question that the actor should cross-reference in the context. Do NOT use placeholders like "<city>" or "<entity>" — use real names.
+- Keep each field under 200 chars. Do not fabricate a gold answer you weren't given.
+
+IMPORTANT: Your output must be about the ACTUAL question shown below, NOT about rivers, cities, or any topic mentioned in this system message.
 
 OUTPUT: a single JSON object, nothing else. Schema:
 {
   "attempt_id": <int>,
-  "failure_reason": "<string>",
+  "failure_reason": "<string grounded in this question>",
   "lesson": "<string>",
-  "next_strategy": "<string>"
+  "next_strategy": "<string with real entity names from this question>"
 }
 """
 

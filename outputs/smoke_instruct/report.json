@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "dataset": "hotpot_real_100.json",
+    "mode": "real",
+    "num_records": 6,
+    "agents": [
+      "react",
+      "reflexion"
+    ],
+    "model": "gpt-3.5-turbo-instruct"
+  },
+  "summary": {
+    "react": {
+      "count": 3,
+      "em": 0.3333,
+      "avg_attempts": 1,
+      "avg_token_estimate": 3805,
+      "avg_latency_ms": 3515.33
+    },
+    "reflexion": {
+      "count": 3,
+      "em": 0.6667,
+      "avg_attempts": 2,
+      "avg_token_estimate": 10106.67,
+      "avg_latency_ms": 7502
+    },
+    "delta_reflexion_minus_react": {
+      "em_abs": 0.3334,
+      "attempts_abs": 1,
+      "tokens_abs": 6301.67,
+      "latency_abs": 3986.67
+    }
+  },
+  "failure_modes": {
+    "entity_drift": {
+      "react": 1,
+      "reflexion": 0
+    },
+    "wrong_final_answer": {
+      "react": 1,
+      "reflexion": 0
+    },
+    "none": {
+      "react": 1,
+      "reflexion": 2
+    },
+    "reflection_overfit": {
+      "react": 0,
+      "reflexion": 1
+    }
+  },
+  "examples": [
+    {
+      "qid": "5a7a567255429941d65f25bd",
+      "agent_type": "react",
+      "gold_answer": "flotilla",
+      "predicted_answer": "Dwarka",
+      "is_correct": false,
+      "attempts": 1,
+      "failure_mode": "entity_drift",
+      "reflection_count": 0
+    },
+    {
+      "qid": "5abca1a55542993a06baf937",
+      "agent_type": "react",
+      "gold_answer": "15 August 1843",
+      "predicted_answer": "1956",
+      "is_correct": false,
+      "attempts": 1,
+      "failure_mode": "wrong_final_answer",
+      "reflection_count": 0
+    },
+    {
+      "qid": "5a73977d554299623ed4ac08",
+      "agent_type": "react",
+      "gold_answer": "Armenian",
+      "predicted_answer": "Armenian American",
+      "is_correct": true,
+      "attempts": 1,
+      "failure_mode": "none",
+      "reflection_count": 0
+    },
+    {
+      "qid": "5a7a567255429941d65f25bd",
+      "agent_type": "reflexion",
+      "gold_answer": "flotilla",
+      "predicted_answer": "flotilla",
+      "is_correct": true,
+      "attempts": 2,
+      "failure_mode": "none",
+      "reflection_count": 1
+    },
+    {
+      "qid": "5abca1a55542993a06baf937",
+      "agent_type": "reflexion",
+      "gold_answer": "15 August 1843",
+      "predicted_answer": "1954",
+      "is_correct": false,
+      "attempts": 3,
+      "failure_mode": "reflection_overfit",
+      "reflection_count": 3
+    },
+    {
+      "qid": "5a73977d554299623ed4ac08",
+      "agent_type": "reflexion",
+      "gold_answer": "Armenian",
+      "predicted_answer": "Armenian American",
+      "is_correct": true,
+      "attempts": 1,
+      "failure_mode": "none",
+      "reflection_count": 0
+    }
+  ],
+  "extensions": [
+    "structured_evaluator",
+    "reflection_memory",
+    "benchmark_report_json",
+    "adaptive_max_attempts",
+    "memory_compression"
+  ],
+  "discussion": "Chạy trên 6 record (mode=real). Exact-match trên ReAct là 0.333 so với 0.667 trên Reflexion (delta +0.333). Reflexion thắng ReAct chủ yếu ở các câu multi-hop mà Actor dừng sớm sau hop đầu hoặc đi nhầm entity ở hop hai - reflection memory đẩy Actor quay lại đọc paragraph thứ hai trước khi trả lời. Chi phí đổi lại là trung bình +1.00 attempts, +6302 tokens và +3987ms mỗi câu so với ReAct, chủ yếu do phải gọi Evaluator + Reflector mỗi lượt sai. Failure mode còn sót lại của Reflexion: reflection_overfit=1; những case này thường do Evaluator một model yếu chấm sai (false positive/negative) khiến Reflector nhận tín hiệu nhiễu, hoặc do entity trong context bị distractor kéo đi (reflection_overfit khi hai chiến lược liên tiếp giống nhau). Giới hạn lớn nhất là dùng chung một model cho Actor/Evaluator/Reflector: khi Actor ngu thì Evaluator cũng ngu, điểm số có thể bị trần. Hướng cải thiện: dùng Evaluator mạnh hơn, thêm retrieval re-rank trước Actor, và bật memory_compression mạnh hơn khi reflection_memory dài để tránh prompt phình to."
+}

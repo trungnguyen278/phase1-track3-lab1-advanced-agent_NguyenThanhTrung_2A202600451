@@ -100,6 +100,16 @@ def test_build_report_has_all_required_keys():
     assert len(dumped["discussion"]) >= 250
 
 
+def test_completions_model_detection():
+    from src.reflexion_lab.real_runtime import _is_completions_model
+    assert _is_completions_model("gpt-3.5-turbo-instruct")
+    assert _is_completions_model("babbage-002")
+    assert _is_completions_model("davinci-002")
+    assert not _is_completions_model("gpt-3.5-turbo")
+    assert not _is_completions_model("gpt-4o-mini")
+    assert not _is_completions_model("gpt-4o")
+
+
 def test_mock_runtime_signatures_match_real():
     """agents.py expects tuple returns; mock must be a valid drop-in."""
     from src.reflexion_lab import mock_runtime as mk
